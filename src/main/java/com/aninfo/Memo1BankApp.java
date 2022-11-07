@@ -1,7 +1,10 @@
 package com.aninfo;
 
+import com.aninfo.exceptions.InvalidTransactionTypeException;
 import com.aninfo.model.Account;
+import com.aninfo.model.Transaction;
 import com.aninfo.service.AccountService;
+import com.aninfo.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -26,6 +29,8 @@ public class Memo1BankApp {
 
 	@Autowired
 	private AccountService accountService;
+	@Autowired
+	private TransactionService transactionService;
 
 	public static void main(String[] args) {
 		SpringApplication.run(Memo1BankApp.class, args);
@@ -64,7 +69,7 @@ public class Memo1BankApp {
 	public void deleteAccount(@PathVariable Long cbu) {
 		accountService.deleteById(cbu);
 	}
-
+/*
 	@PutMapping("/accounts/{cbu}/withdraw")
 	public Account withdraw(@PathVariable Long cbu, @RequestParam Double sum) {
 		return accountService.withdraw(cbu, sum);
@@ -74,7 +79,41 @@ public class Memo1BankApp {
 	public Account deposit(@PathVariable Long cbu, @RequestParam Double sum) {
 		return accountService.deposit(cbu, sum);
 	}
+*/
+	@PostMapping("/transaction")
+	public Transaction createTransaction(@RequestBody Transaction transaction){
 
+		Optional<Account> accountOptional = accountService.findById(transaction.getCbu());
+
+		if (!accountOptional.isPresent()) {
+			throw new InvalidTransactionTypeException("no se encuentra el cbu");
+		}
+		transactionService.operation(accountService,transaction);
+		return transactionService.createTransaction(transaction);
+
+	}
+
+	@GetMapping("/transactions")
+	public Collection<Transaction> getTransactions() {
+		return transactionService.getTransactions();
+	}
+
+	@GetMapping("/transaction/id/{id}")
+	public ResponseEntity<Transaction> getTransactionById(@PathVariable Long id) {
+		Optional<Transaction> transactionOptional = transactionService.findById(id);
+		return ResponseEntity.of(transactionOptional);
+	}
+
+
+	@DeleteMapping("/transaction/{id}")
+	public void deleteTransaction(@PathVariable Long id) {
+		transactionService.deleteById(id);
+	}
+
+	@GetMapping("/transaction/cbu/{cbu}")
+	public Collection<Transaction> getTransactionsByCbu(@PathVariable Long cbu) {
+		return transactionService.getTransactionsByCbu(cbu);
+	}
 	@Bean
 	public Docket apiDocket() {
 		return new Docket(DocumentationType.SWAGGER_2)
