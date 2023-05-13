@@ -45,6 +45,10 @@ public class AccountService {
             throw new InsufficientFundsException("Insufficient funds");
         }
 
+        if (sum <= 0) {
+            throw new DepositNegativeSumException("Cannot withdraw negative sums");
+        }
+
         account.setBalance(account.getBalance() - sum);
         accountRepository.save(account);
 
