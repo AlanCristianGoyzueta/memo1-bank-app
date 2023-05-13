@@ -26,6 +26,10 @@ public class TransactionService {
     }
 
     public Optional<Transaction> findById(Long id) {
+        Optional<Transaction> transaction = transactionRepository.findById(id);
+        if(!transaction.isPresent()){
+            throw new InvalidTransactionTypeException("Cannot find transaction with id "+ id);
+        }
         return transactionRepository.findById(id);
     }
 
@@ -43,7 +47,7 @@ public class TransactionService {
                 accountService.withdraw(transaction.getCbu(), transaction.getSum());
                 break;
             default:
-                throw new InvalidTransactionTypeException("tipo de operacion no valida");
+                throw new InvalidTransactionTypeException("invalid type of operation");
         }
     }
 

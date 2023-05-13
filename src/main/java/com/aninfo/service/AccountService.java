@@ -1,6 +1,8 @@
 package com.aninfo.service;
 
 import com.aninfo.exceptions.DepositNegativeSumException;
+import com.aninfo.exceptions.WithdrawNegativeSumException;
+import com.aninfo.exceptions.BalanceNegativeException;
 import com.aninfo.exceptions.InsufficientFundsException;
 import com.aninfo.model.Account;
 import com.aninfo.repository.AccountRepository;
@@ -18,6 +20,9 @@ public class AccountService {
     private AccountRepository accountRepository;
 
     public Account createAccount(Account account) {
+        if(account.getBalance() < 0){
+            throw new BalanceNegativeException("Cannot create account with negative balance");
+        }
         return accountRepository.save(account);
     }
 
@@ -46,7 +51,7 @@ public class AccountService {
         }
 
         if (sum <= 0) {
-            throw new DepositNegativeSumException("Cannot withdraw negative sums");
+            throw new WithdrawNegativeSumException("Cannot withdraw negative sums");
         }
 
         account.setBalance(account.getBalance() - sum);

@@ -86,7 +86,7 @@ public class Memo1BankApp {
 		Optional<Account> accountOptional = accountService.findById(transaction.getCbu());
 
 		if (!accountOptional.isPresent()) {
-			throw new InvalidTransactionTypeException("no se encuentra el cbu");
+			throw new InvalidTransactionTypeException("the cbu is not found");
 		}
 		transactionService.operation(accountService,transaction);
 		return transactionService.createTransaction(transaction);
